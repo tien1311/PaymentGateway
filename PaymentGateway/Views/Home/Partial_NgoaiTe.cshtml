@@ -1,0 +1,38 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering;
+
+@model List<Rates>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h3 class="text-center">Giá ngoại tệ hôm nay</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">
+                                Tên loại ngoại tệ
+                            </th>
+                            <th class="text-center">
+                                Mã ngoại tệ
+                            </th>
+                            <th class="text-center">
+                                Tiền quy đổi (VNĐ)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var rates in Model)
+                        {
+                            <tr>
+                                <td>@rates.CurrencyName</td>
+                                <td>@rates.CurrencyCode</td>
+                                <td>@rates.Transfer</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

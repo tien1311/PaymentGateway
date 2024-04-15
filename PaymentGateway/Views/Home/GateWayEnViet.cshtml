@@ -1,0 +1,631 @@
+﻿@model List<Payment>
+@using Appota.Common;
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+    body {
+        background-color: #f4f6f8;
+    }
+
+    section {
+        background-color: white;
+        border-radius: 8px;
+        border: solid 1px #dbdbdb;
+        padding: 24px;
+    }
+
+        section:not(:first-child) {
+            margin: 16px 0;
+        }
+
+    .content-box {
+        border-radius: 8px;
+    }
+
+    .total-price {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .order__header {
+        font-size: 20px;
+    }
+
+    .order__title {
+        font-size: 16px;
+    }
+
+    .radio-button {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+        .radio-button input[type="radio"] {
+            display: none; /* Giấu nút radio */
+        }
+
+        .radio-button label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Để hình ảnh nằm giữa */
+
+            padding: 12px 5px;
+            border: 1px solid #dbdbdb; /* CSS mặc định */
+            transition: border-color 0.3s ease;
+            border-radius: 8px;
+        }
+
+            .radio-button label:hover {
+                border-color: #ccc; /* CSS khi hover */
+            }
+
+        .radio-button input[type="radio"]:checked + label {
+            background-color: #FFF5EE; /*CSS khi check vào nút*/
+            border: 1px solid #f5821f;
+        }
+
+        .radio-button input[type="radio"] + label {
+            background-color: #FFFFFF;
+        }
+
+        .radio-button img {
+            width: 40px; /* CSS hình của radio */
+            height: 40px;
+            margin-right: 10px;
+        }
+
+
+    .TotalPay {
+        font-weight: bold;
+        color: #0b5394;
+    }
+
+    .OrderCode {
+        color: #f5821f;
+    }
+
+    .btn__xac-nhan {
+        background-color: #1a75e5; /* CSS nút Submit*/
+        color: white;
+        border-radius: 8px;
+    }
+
+        .btn__xac-nhan:hover {
+            color: white;
+            opacity: 0.5;
+        }
+
+    .paymentType__header {
+        margin-left: 24px;
+        margin-top: 12px;
+        color: #f5821f;
+        font-size: 14px;
+    }
+
+    .list-payment-type {
+        /* margin-left: 18px; */
+        padding: 0 22px;
+    }
+
+
+    #countdownContainer {
+        display: flex;
+        margin: 12px;
+    }
+
+    .countdownBox {
+        background-color: #1a75e5;
+        color: white;
+        margin: 0 2px;
+        padding: 5px;
+        border: 2px solid #dbdbdb;
+        border-radius: 8px;
+        font-size: 18px;
+        width: 40px;
+        text-align: center;
+    }
+
+    .currencyExchangeTitle {
+        font-size: 14px;
+    }
+
+    .SeeCurrencyExchange {
+        cursor: pointer;
+        font-size: 14px;
+        float: right;
+        color: #2aabe2;
+    }
+
+    .modal-dialog {
+        max-width: 50%;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .order-section,
+    .contact-section,
+    .payment-section,
+    .payment-type-section,
+    .payment-info-section {
+        width: 100%;
+        margin-bottom: 16px;
+    }
+
+    /* CSS cho hình ảnh khi màn hình nhỏ */
+    @@media only screen and (max-width: 767px) {
+        .radio-button img {
+            margin-right: 0; /* Loại bỏ margin phải */
+        }
+
+        .currencyExchangeTitle, .SeeCurrencyExchange {
+            font-size: 12px;
+        }
+
+        .total-price {
+            font-size: 14px;
+        }
+
+
+        .modal-dialog {
+            max-width: 80%;
+            margin: 1rem auto;
+        }
+
+        .modal-header {
+            padding: 1rem;
+        }
+    }
+
+</style>
+
+<hr />
+
+<h3 style="font-size: 24px">Thông tin thanh toán</h3>
+
+<div id="countdownContainer">
+    <div class="countdownBox" id="hoursBox">00</div>
+    <div class="countdownBox" id="minutesBox">00</div>
+    <div class="countdownBox" id="secondsBox">00</div>
+</div>
+
+<form asp-action="SubmitThanhToan" method="post">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 col-sm-12">
+                <div class="content-box">
+
+                    <section class="order-section">
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="order__header">Thông tin đơn hàng</h5>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-5">
+                                <p class="order__title">Mã đơn hàng</p>
+                            </div>
+                            <div class="col-7">
+                                <p class="float-end"><span class="OrderCode">EV00001</span></p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-5">
+                                <p class="order__title">Ghi chú</p>
+                            </div>
+                            <div class="col-7">
+                                <p class="float-end">Đây là ghi chú cho đơn hàng....</p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-12">
+                                <p class="order__title">Sản phẩm</p>
+                            </div>
+                        </div>
+
+                        <table class="table table-responsive-sm">
+
+                            @* Lấy từ API qua *@
+
+                            <thead>
+                                <tr>
+                                    <th>Tên sản phẩm</th>
+                                    <th class="text-center">Số lượng</th>
+                                    <th class="text-center">Đơn giá (VNĐ)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Yến Sào</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-center">@Common.FormatNumber(50000, 0)</td>
+                                </tr>
+                                <tr>
+                                    <td>Tour</td>
+                                    <td class="text-center">2</td>
+                                    <td class="text-center">@Common.FormatNumber(50000, 0)</td>
+                                </tr>
+
+                                @*  Tổng tiền *@
+
+                                <tr>
+                                    <td colspan="2"> <strong>Thành tiền</strong> </td>
+                                    <td class="text-center">@Common.FormatNumber(150000, 0)</td>
+                                </tr>
+
+                                <tr>
+                                    <td colspan="2"> <strong>Chiết khấu</strong> </td>
+                                    <td class="text-center">@Common.FormatNumber(10000, 0)</td>
+                                </tr>
+
+                                <tr>
+                                    <td colspan="2"> <strong>Tổng tiền</strong> </td>
+                                    <td class="text-center">@Common.FormatNumber(160000, 0)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </section>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <section style="margin-bottom:16px;" class="contact-section">
+                    <div class="row">
+                        <div class="col-12">
+                            <h5 class="order__header">Thông tin liên hệ</h5>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-5">
+                            <p class="order__title">Mã khách hàng</p>
+                        </div>
+                        <div class="col-7">
+                            <p class="float-end"><span class="OrderCode">KH00001</span></p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-5">
+                            <p class="order__title">Tên khách hàng</p>
+                        </div>
+                        <div class="col-7">
+                            <p class="float-end">Nguyễn Văn A</p>
+                            <input type="text" hidden name="userName" value="Nguyễn Văn A" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-5">
+                            <p class="order__title">Email</p>
+                        </div>
+                        <div class="col-7">
+                            <p class="float-end"><span>enviet@gmail.com</span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5">
+                            <p class="order__title">Số điện thoại</p>
+                        </div>
+                        <div class="col-7">
+                            <p class="float-end"><span>0123456789</span></p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-4">
+                            <p class="order__title">Địa chỉ</p>
+                        </div>
+                        <div class="col-8">
+                            <p class="float-end"><span>16B Sông Đà, Phường 02, Quận Tân Bình, Thành phố Hồ Chí Minh</span></p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 col-sm-12">
+                <section class="payment-section">
+                    <div class="row">
+                        <div class="col-12">
+                            <h5 class="order__header">Phương thức thanh toán</h5>
+                        </div>
+                    </div>
+                    <br />
+
+                    <div class="row g-1">
+
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <div class="col-4">
+                                    <div class="radio-button">
+                                        <input type="radio" id="@item.Name" data-id="@item.Id" value="@item.Name" name="paymentType" />
+                                        <label style="width:100%" for="@item.Name">
+                                            <img src="@item.Image" alt="@item.Name" />
+                                            <span class="payment-name d-none d-md-inline">Thanh toán qua @item.Name </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </section>
+
+                <div class="paymentType payment-type-section">
+                    <div class="row">
+                        <div class="col-12">
+                            <h5 class="paymentType__header">Loại thanh toán</h5>
+                        </div>
+                    </div>
+
+                    <div class="list-payment-type">
+
+                        <div class="row g-1 list-payment-type-item">
+
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var item in Model)
+                                {
+                                    if (item.PaymentFees.Count > 0)
+                                    {
+                                        var requestType = item.PaymentFees.Where(x => x.PaymentId == item.Id && x.IsActived).ToList();
+
+                                        foreach (var request in requestType)
+                                        {
+                                            <div class="col-4" data-id="@item.Id">
+                                                <div class="radio-button">
+                                                    <input type="radio" id="@request.RequestType" data-id="requestType" value="@request.RequestType" data-percent="@request.Percent" data-fixedcosts="@request.FixedCosts" name="requestType" />
+                                                    <label style="width:100%" for="@request.RequestType">
+                                                        <img src="@request.Image" alt="@request.RequestType" />
+                                                        <span class="payment-name d-none d-md-inline">Thanh toán qua @request.Name</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                }
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="payment-info-section order-3">
+                    <div class="content-box p-4 bg-white" style="border: solid 1px #dbdbdb">
+
+                        <div class="row mb-2">
+                            <div class="col-6">
+                                @if (!string.IsNullOrEmpty(ViewBag.VNDtoUSD))
+                                {
+                                    <p class="currencyExchangeTitle">1 USD = <span class="text-danger"> @Common.FormatNumber(int.Parse(ViewBag.VNDtoUSD), 0)</span> VNĐ </p>
+                                }
+                            </div>
+                            <div class="col-6">
+
+                                <p id="showRates" class="SeeCurrencyExchange">Xem tỷ lệ quy đổi ngoại tệ</p>
+                            </div>
+                        </div>
+
+
+                        <div class="row mb-2">
+                            <div class="col-12">
+                                <h5>Số tiền thanh toán</h5>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row mb-2">
+                            <div class="col-4">
+                                <p class="order__title">Tạm tính</p>
+                            </div>
+                            <div class="col-8">
+                                @* Lấy từ API qua *@
+                                <p class="float-end"><span class="SubTotal">160000</span> đ</p> 
+                                <input type="text" hidden name="Money" class="SubTotalValue" value="150000" />
+                            </div>
+                        </div>
+
+
+                        <div class="row mb-2">
+                            <div class="col-4">
+                                <p data-id="requestTypePercent" class="order__title">Phí (0)</p>
+                            </div>
+                            <div class="col-8">
+                                <p class="float-end"><span class="FeeDependOnSth">0</span> đ</p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-4">
+                                <p data-id="requestTypeFixedCosts" class="order__title">Phí cố định</p>
+                            </div>
+                            <div class="col-8">
+                                <p class="float-end"><span class="FixedCost">0</span> đ</p>
+                            </div>
+                        </div>
+
+                        <hr />
+                        <div class="row mb-2">
+                            <div class="col-4">
+                                <p class="total-price">TỔNG TIỀN</p>
+                            </div>
+                            <div class="col-8">
+                                <p class="float-end"><span class="TotalPay">150000</span> đ</p>
+                                <input type="text" hidden class="TotalPayInput" name="TotalPay" value="150000" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn__xac-nhan p-2" id="btn-submit" style="width: 100%">Xác nhận</button>
+                <!-- Định nghĩa modal -->
+                <div class="modal fade" id="ratesModal" tabindex="-1" role="dialog" aria-labelledby="ratesModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h6 class="modal-title" id="ratesModalLabel">Được cung cấp bởi Vietcombank</h6> <br />
+                            </div>
+                            <div class="modal-body">
+                                <!-- Định nghĩa div chứa nội dung của PartialView -->
+                                <div id="partialViewContainer"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <script type="text/javascript">
+        window.onload = function () {
+            var message = '@Html.Raw(TempData["ErrorMessage"])';
+            Swal.fire({
+                title: "Lỗi!",
+                text: message,
+                icon: "error",
+                button: "OK",
+            });
+        };
+    </script>
+}
+
+<script>
+
+    // Hàm format số thành dạng xxx,xxx
+    function formatNumber(number) {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+
+    $(document).ready(function () {
+
+        // $('.SubTotal').text(formatNumber($('.SubTotal').text()));
+        $('.FeeDependOnSth').text(formatNumber($('.FeeDependOnSth').text()));
+        $('.SubTotal').text(formatNumber(parseFloat($('.SubTotal').text())));
+        $('.TotalPay').text(formatNumber(parseFloat($('.TotalPay').text())));
+
+        // Check radio
+        $('div.list-payment-type-item > div').hide()
+        $('.paymentType__header').hide()
+
+        $('input[name="paymentType"]').on('click', function () {
+            var id = $(this).data('id');
+            $('.paymentType__header').show()
+            $('div.list-payment-type-item > div').hide(); // ẩn tất cả các phần tử
+            $('div.list-payment-type-item > div[data-id="' + id + '"]').show(); // hiển thị phần tử tương ứng
+        });
+
+        $('input[name="requestType"]').on('click', function () {
+            // Lấy giá trị %
+            var percent = $(this).data('percent');
+            percent = percent;
+            $('p[data-id="requestTypePercent"]').text('Phí (' + percent + ' %)');
+
+            // Lấy giá cố định
+            var fixedcosts = $(this).data('fixedcosts');
+            fixedcosts = parseFloat(fixedcosts)
+
+            // Tính tiền tạm tính
+            var subtotal = $('.SubTotalValue').val();
+            var fee = subtotal * percent / 100;
+
+            // Format và cập nhật số tiền phí
+            $('.FeeDependOnSth').text(formatNumber(fee));
+
+            var formattedFixedCosts = fixedcosts.toFixed(0);
+            $('.FixedCost').text(formatNumber(formattedFixedCosts));
+
+            console.log(formattedFixedCosts);
+
+            //Tính tổng tiền
+            var totalPay = parseFloat(subtotal) + fee + fixedcosts;
+
+
+            // Format và cập nhật tổng số tiền
+            $('.TotalPay').text(formatNumber(totalPay));
+            $('.TotalPayInput').val(totalPay);
+        });
+
+
+        // Mở popup
+        $("#showRates").click(function () {
+            $.get("/Home/Partial_NgoaiTe", function (data) {
+                $("#partialViewContainer").html(data);
+                // Mở modal
+                $("#ratesModal").modal('show');
+            });
+        });
+
+        // Disable button on submit
+        $('form').submit(function () {
+            $('#btn-submit').prop('disabled', true);
+            $('#btn-submit').prop('cursor', 'no-drop');
+
+        });
+
+    });
+
+    // Đếm ngược
+    var countDownTime = 5 * 60; // 5 phút
+    var hoursBox = document.getElementById('hoursBox');
+    var minutesBox = document.getElementById('minutesBox');
+    var secondsBox = document.getElementById('secondsBox');
+
+    var countDownTimer = setInterval(function () {
+        var hours = Math.floor(countDownTime / 3600);
+        var minutes = Math.floor((countDownTime % 3600) / 60);
+        var seconds = countDownTime % 60;
+
+        // Định dạng thời gian hiển thị HH:mm:ss
+        hoursBox.textContent = ('0' + hours).slice(-2);
+        minutesBox.textContent = ('0' + minutes).slice(-2);
+        secondsBox.textContent = ('0' + seconds).slice(-2);
+
+        countDownTime--;
+
+        if (countDownTime < 0) {
+            clearInterval(countDownTimer);
+            window.location.href = '@Url.Action("Index", "Home")';
+        }
+    }, 1000);
+
+    window.onbeforeunload = function () {
+        clearInterval(countDownTimer);
+    };
+
+
+
+    // Cắt chuỗi
+    var paymentNames = document.getElementsByClassName("payment-name");
+    for (var i = 0; i < paymentNames.length; i++) {
+        var text = paymentNames[i].innerText;
+        if (text.length > 23) {
+            var newText = text.substring(0, 23) + "..."
+            paymentNames[i].innerText = newText
+        }
+    }
+
+
+
+
+</script>

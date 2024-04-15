@@ -1,0 +1,57 @@
+﻿@model UsersPay;
+@using Appota.Common
+
+<script>
+    function displayPaymentResult(model) {
+        debugger;
+        if (model != null) {
+            if (model.resultCode == 0) {
+                var formattedAmount = model.amount.toLocaleString('en-US');
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thanh toán thành công',
+                    html: `
+                            <p>Tên: <span class="fw-bold">${model.name}</span></p>
+                            <p>Mã đơn hàng: <span class="fw-bold">${model.orderId}</span></p>
+                                <p>Tổng tiền: <span class="fw-bold">${formattedAmount}</span></p>
+                        `
+                }).then((result) => {
+                    // Redirect to Home/Index
+                    if (result.isConfirmed) {
+                        window.location.href = '/Home/Index';
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Thanh toán thất bại',
+                    text: model.paymentStatus
+                }).then((result) => {
+                    // Redirect to Home/Index
+                    if (result.isConfirmed) {
+                        window.location.href = '/Home/Index';
+                    }
+                });
+            }
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: 'Không có dữ liệu'
+            }).then((result) => {
+                // Redirect to Home/Index
+                if (result.isConfirmed) {
+                    window.location.href = '/Home/Index';
+                }
+            });
+        }
+    }
+    var modelJson = @Json.Serialize(Model);
+
+    // Call the function to display payment result when page is loaded
+    displayPaymentResult(modelJson);
+</script>
+
+
+

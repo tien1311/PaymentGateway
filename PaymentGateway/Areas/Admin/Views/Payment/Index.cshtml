@@ -1,0 +1,594 @@
+﻿@model List<Appota.Models.Payment>
+@using Appota.Common
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+<style>
+
+    .accordion-item .accordion-button {
+        border: 1px solid #dbdbdb;
+    }
+
+    /* CSS nút switch */
+
+    /* Switch container */
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+
+        /* Hide default checkbox */
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+    /* The slider (circle) */
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+    input:checked + .slider {
+        background-color: #f5821f;
+    }
+
+    input:focus + .slider {
+        box-shadow: 0 0 1px #f5821f;
+    }
+
+    input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+        border-radius: 34px;
+    }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+
+    @@media only screen and (min-width: 768px) {
+
+  /*       .paymentTypeNameButton {
+            width: 180px;
+            max-width: 200px; 
+        } */
+
+
+        label.switch.mb-2 {
+            margin-right: 18px;
+        }
+
+        .updatePaymentTypeImage, .AccordionPaymentType {
+            margin: auto 0;
+        }
+
+        .updatePaymentTypeImageButton {
+            margin-bottom: 8px;
+        }
+
+        .PaymentTypeImage {
+            width: 100px;
+            height: 100px;
+            margin: 8px;
+        }
+
+
+        .switch-paymentType-Button {
+            display: flex;
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .UpdateImagePaymentTypeRow {
+            padding-left: 16px;
+        }
+
+        .AccordionPaymentType {
+        }
+    }
+
+    @@media only screen and (max-width: 767px) 
+    {
+
+        .switch {
+            margin-right: 3px;
+            margin-top: 3px;
+        }
+
+        .slider-paymentType.slider {
+            left: -3px;
+        }
+
+        .mobile-button {
+            width: 100px;
+            height: auto; 
+            font-size: 12px; 
+            margin-left: 80px;
+        }
+
+        .slider-paymentType.slider:before {
+            left: 4px;
+        }
+
+        .slider-paymentType.slider.round:before {
+            border-radius: 50%;
+        }
+
+        input:checked + .slider-paymentType.slider:before {
+            transform: translateX(10px);
+        }
+
+        .mobile-file {
+            width: 140px;
+            height: auto; /* Đảm bảo chiều cao tự động dựa trên nội dung */
+        }
+
+        .switch-paymentType-Button {
+            /* padding-left: 38px; */
+            display: flex;
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+        }
+
+        table th {
+            min-width: 140px;
+        }
+
+        .paymentTypeNameButton {
+           
+        }
+
+        .updatePaymentTypeImage {
+            margin-top: 8px;
+        }
+
+        .updatePaymentTypeImageButton {
+        }
+
+        .PaymentTypeImageContainer {
+            display: flex;
+            justify-content:center;
+            align-items: center;
+        }
+
+        .PaymentTypeImage {
+            width: 50px;
+            height: 50px;
+            margin-left: 13px;
+            margin-top: 2px;
+            margin-bottom: 2px;
+        }
+
+        .col-2.col-md-1.switch-paymentType-Button.order-md-last {
+            margin-top: 5px;
+        }
+    }
+
+</style>
+
+<div>
+    <a asp-area="Admin" asp-controller="Payment" asp-action="Add" class="btn btn-primary float-end">Thêm phương thức</a>
+</div>
+
+<br />
+
+<div id="accordion">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var item in Model)
+        {
+            <br />
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" style="border-top: solid 1px #dbdbdb;" id="heading@(item.Id)">
+                    <div class="row justify-content-between">
+                        
+
+                        <div class="col-2 col-md-1 PaymentTypeImageContainer">
+                            <img class="PaymentTypeImage" src="@item.Image" />
+
+                        </div>
+                                <div class="col-8 col-md-6 updatePaymentTypeImage ">
+                                    <div class="row UpdateImagePaymentTypeRow">
+                                        <div class="col-6 col-md-12">
+                                    @using (Html.BeginForm("ChangePaymentImage", "Payment", FormMethod.Post, new { enctype = "multipart/form-data", id = "paymentForm" }))
+                                    {
+                                        <div class="row">
+                                            <div class="col-6 col-md-9">
+                                                <input name="PaymentImage" type="file" class="form-control-file form-control mobile-file updatePaymentTypeImageInput" id="PaymentImage">
+                                                <input type="hidden" name="PaymentId" value="@item.Id" />
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <button type="submit" class="btn btn-success updatePaymentTypeImageButton mobile-button">Cập nhật ảnh</button>
+                                            </div>
+                                        </div>
+                                    }
+                                        </div>
+                                      @*   <div class="col-6 col-md-3">
+                                            <button type="submit" class="btn btn-success updatePaymentTypeImageButton">Cập nhật ảnh</button>
+                                        </div> *@
+                                    </div>
+                                </div>
+                        <div class="col-2 col-md-1 switch-paymentType-Button order-md-last">
+                            <label class="switch-paymentType switch mb-2">
+                                <input type="checkbox" data-id="@item.Id" class="btnActive" @(item.IsActived ? "checked" : "") />
+                                <span class="slider-paymentType slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="col-12 col-md-4 AccordionPaymentType d-block">
+                            <button class="accordion-button collapsed paymentTypeNameButton" type="button" style="padding-top:8px; padding-bottom: 8px; margin-bottom:6px;" data-bs-toggle="collapse" data-bs-target="#collapse@(item.Id)" aria-expanded="false" aria-controls="collapse@(item.Id)">
+                                @item.Name
+                            </button>
+                        </div>
+@* 
+                        <div class="col-2 col-md-1 switch-paymentType-Button order-first order-md-last">
+                            <label class="switch mb-2">
+                                <input type="checkbox" data-id="@item.Id" class="btnActive" @(item.IsActived ? "checked" : "") />
+                                <span class="slider round"></span>
+                            </label>
+                        </div> *@
+                 
+              @*           <div class="col-md-8">
+                            @using (Html.BeginForm("ChangePaymentImage", "Payment", FormMethod.Post, new { enctype = "multipart/form-data", id = "paymentForm" }))
+                            {
+                                <div class="row">
+                                    <div class="col-8">
+                                        <input name="PaymentImage" style="margin: 4px 0;" type="file" class="form-control-file form-control" id="PaymentImage">
+                                        <input type="hidden" name="PaymentId" value="@item.Id" />
+                                    </div>
+
+                                    <div class="col-4">
+                                        <button type="submit" style="margin-left:-18px; margin-bottom: 2px;" class="btn btn-success">Cập nhật ảnh</button>
+                                    </div>
+                                </div>
+                            }
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse@(item.Id)" aria-expanded="false" aria-controls="collapse@(item.Id)">
+                                @item.Name
+                            </button>
+                        </div> *@
+                    </div>
+                </h2>
+
+                <div id="collapse@(item.Id)" class="accordion-collapse collapse" aria-labelledby="heading@(item.Id)" data-bs-parent="#accordion">
+                    <div class="accordion-body ">
+                        @using (Html.BeginForm("Edit", "Payment", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        {
+                            <div class="table-responsive-md">
+                                <table id="feeTable@(item.Id)" class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Trạng thái</th>
+                                            <th>Ảnh</th>
+                                            <th>Tên loại thanh toán</th>
+                                            <th>Chi phí %</th>
+                                            <th>Giá trị cố định</th>
+                                            <th>Mã loại thanh toán</th>
+                                            <th>Thay đổi ảnh</th>
+                                            <th>Hành động</th>
+                                        </tr>
+                                    </thead>
+
+
+                                    <tbody>
+                                        @foreach (var fee in item.PaymentFees)
+                                        {
+                                            <tr class="feeRow">
+                                                <td class="text-center">
+                                                    <label class="switch">
+                                                        <input type="checkbox" data-id="@fee.Id" class="btnFeeActive" @(fee.IsActived ? "checked" : "") />
+
+                                                        <span class="slider round"></span>
+                                                    </label>
+                                                </td>
+                                                <td class="text-center">
+                                                    <img style="width:40px;height:40px;" src="@fee.Image" />
+                                                </td>
+                                                <td> <input name="FeeName[]" value="@fee.Name" type="text" class="form-control" placeholder="Nhập tên loại thanh toán" />   </td>
+                                                <td> <input name="Percent[]" value="@fee.Percent" step="any" min="0" type="number" class="form-control" placeholder="Nhập tỷ lệ %" />  </td>
+                                                <td> <input name="FixedCosts[]" value="@fee.FixedCosts" step="any" type="number" min="0" class="form-control fixedCostInput" data-fixedcosts="@fee.Id" placeholder="Nhập giá cố định" /></td>
+                                                <td> <input name="RequestType[]" value="@fee.RequestType" type="text" class="form-control" placeholder="Nhập Mã loại thanh toán" /></td>
+                                                <td class="custom-file">
+                                                    <input type="file" class="form-control-file requestTypeImageInputFile form-control" id="requestTypeImage" value="@fee.Image">
+                                                    <input type="text" hidden name="requestTypeImage[]" class="requestTypeImageInputValue" value="@fee.Image" />
+                                                </td>
+
+                                                <td>
+                                                    @if (item.PaymentFees.IndexOf(fee) != 0)
+                                                    {
+                                                        <a href="#" class="btnDeleteFee btn btn-sm btn-danger" data-id="@fee.Id"><i class="fa-regular fa-trash-can"></i></a>
+                                                    }
+                                                    <input type="text" name="PaymentID" value="@fee.PaymentId" hidden />
+                                                    <input type="text" name="PaymentFeeId" value="@fee.Id" hidden />
+                                                </td>
+                                            </tr>
+
+                                        }
+                                    </tbody>
+                                </table>
+                                </div>
+                            <input type="button" class="button-add-line btn btn-primary addFee" id="addFee" data-tableid="@item.Id" value="Thêm Loại thanh toán" />
+                            <button type="submit" id="submitForm" class="btn btn-success">Lưu</button>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    <span class="text-danger"> Chưa có dữ liệu </span>
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordion">
+                <div class="accordion-body">
+                    <span class="text-danger"> Chưa có dữ liệu </span>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <script type="text/javascript">
+        window.onload = function () {
+            var message = '@Html.Raw(TempData["ErrorMessage"])';
+            Swal.fire({
+                title: "Lỗi!",
+                text: message,
+                icon: "error",
+                button: "OK",
+            });
+        };
+    </script>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <script type="text/javascript">
+        window.onload = function () {
+            var message = '@Html.Raw(TempData["SuccessMessage"])';
+            Swal.fire({
+                title: "Thành công!",
+                text: message,
+                icon: "success",
+                button: "OK",
+            });
+        };
+    </script>
+}
+
+<script>
+    $('.feeRow').each(function () {
+        var row = $(this);
+        var fixedCostInput = row.find('.fixedCostInput');
+        var inputValue = fixedCostInput.val();
+        inputValue = parseFloat(inputValue);
+        // Lấy giá trị từ input
+        var formattedValue = inputValue.toFixed(0);
+
+        // Thiết lập giá trị đã làm tròn vào input FixedCosts trong hàng này
+        fixedCostInput.val(formattedValue);
+    });
+
+
+    $(document).ready(function () {
+        $('body').on('change', '.btnActive', function () {
+            var checkbox = $(this);
+            var id = checkbox.data('id');
+
+            $.ajax({
+                url: '/admin/Payment/IsActive',
+                type: 'POST',
+                data: { id: id },
+                success: function (result) {
+                    if (result.success) {
+                        checkbox.attr("checked", "checked");
+                    }
+                    else {
+                        checkbox.removeAttr('checked');
+                    }
+                }
+            })
+        })
+
+        $('body').on('change', '.btnFeeActive', function () {
+            var checkbox = $(this);
+            var id = checkbox.data('id');
+
+            $.ajax({
+                url: '/admin/Payment/FeeIsActive',
+                type: 'POST',
+                data: { id: id },
+                success: function (result) {
+                    if (result.success) {
+                        checkbox.attr("checked", "checked")
+                    }
+                    else {
+                        checkbox.removeAttr('checked')
+                    }
+                }
+            })
+        });
+
+        $('body').on('change', '.custom-file input[type="file"]', function () {
+            var fileInput = $(this);
+            var id = fileInput.closest('.feeRow').find('input[name="PaymentId"]').val();
+            var formData = new FormData();
+            formData.append('PaymentId', id);
+            formData.append('PaymentImage', fileInput.prop('files')[0]);
+
+            $.ajax({
+                url: '/admin/Payment/ChangePaymentImage',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (result) {
+                    if (result.success) {
+                        location.reload();
+                        alert("Đổi ảnh thành công");
+                    }
+                },
+            });
+        });
+
+
+        // $('body').on('click', '.btnDeleteFee', function () {
+        //     var id = $(this).data("id");
+        //     var confirmMessage = confirm("Bạn có thực sự muốn xoá?");
+        //     if (confirmMessage === true) {
+        //         $.ajax({
+        //             url: '/admin/Payment/DeleteFee',
+        //             type: 'POST',
+        //             data: { id: id },
+        //             success: function (result) {
+        //                 if (result.success) {
+        //                     location.reload()
+        //                 }
+        //             }
+        //         })
+        //     }
+        // });
+
+        $('body').on('click', '.btnDeleteFee', function () {
+            var id = $(this).data("id");
+            Swal.fire({
+                title: 'Bạn có thực sự muốn xoá?',
+                text:'Bạn sẽ không thể khôi phục sau khi xoá',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Xoá',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/admin/Payment/DeleteFee',
+                        type: 'POST',
+                        data: { id: id },
+                        success: function (result) {
+                            if (result.success) {
+                                location.reload();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+
+        // Xử lý sự kiện click cho các nút "Thêm phí" chung
+        $(".addFee").click(function () {
+            var tableId = $(this).data('tableid');
+            var targetTable = $("#feeTable" + tableId);
+            console.log(targetTable);
+            var newRow = targetTable.find(".feeRow").first().clone();
+            newRow.find('input').val('');
+
+            newRow.find('td:nth-child(2) img').attr('src', '/lib/Content/Uploads/logo/enviet-logo.png');
+            var removeButton = $('<button type="button" class="btn btn-danger removeFee">Xóa</button>');
+            newRow.find('td:nth-child(8)').empty().append(removeButton);
+
+
+            // Thêm dòng mới vào bảng
+            targetTable.find("tbody").append(newRow);
+        });
+
+        $(document).on('click', '.removeFee', function () {
+            $(this).closest('tr').remove();
+        });
+
+        $('body').on('change', '.requestTypeImageInputFile', function () {
+            var input = $(this);
+            var fileName = input.val(); // Lấy tên file đã chọn
+            // Loại bỏ phần "C:\fakepath\" từ đường dẫn
+            fileName = fileName.replace(/^.*[\\\/]/, '');
+            // Hiển thị đường dẫn của file trong ô input text
+            input.closest('.feeRow').find('.requestTypeImageInputValue').val("wwwroot/lib/Content/Uploads/logo/" + fileName);
+        });
+
+
+        $('#paymentForm').submit(function (e) {
+            e.preventDefault();
+            var formData = new FormData($(this)[0]);
+            $.ajax({
+                url: '/admin/Payment/ChangePaymentImage',
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    if (data.success) {
+                        Swal.fire({
+                            title: "Cập nhật thành công",
+                            icon: "success"
+                        }).then((result) => {
+                            location.reload();
+                        })
+                    } else {
+                        alert('Có lỗi xảy ra khi cập nhật hình ảnh.');
+                    }
+                },
+                error: function () {
+                    alert('Có lỗi xảy ra khi gửi yêu cầu.');
+                }
+            });
+            return false;
+        });
+
+
+
+    });
+
+</script>
